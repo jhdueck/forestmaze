@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Math Maze Forest Quest</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #222;
+      font-family: sans-serif;
+      color: white;
+      text-align: center;
+    }
+    canvas {
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌲 Math Maze: Forest Quest 🌲</h1>
+  <p>Use arrow keys to move. Answer math questions to reveal the forest path!</p>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+  <script>
+    const config = {
+      type: Phaser.AUTO,
+      width: 640,
+      height: 480,
+      backgroundColor: '#88cc88',
+      physics: {
+        default: 'arcade',
+        arcade: {
+          debug: false
+        }
+      },
+      scene: {
+        preload,
+        create,
+        update
+      }
+    };
+
+    const game = new Phaser.Game(config);
+
+    let player;
+    let cursors;
+    let clouds = [];
+    let questions = [
+      {q: "3 + 4 = ?", a: 7},
+      {q: "6 x 2 = ?", a: 12},
+      {q: "9 - 5 = ?", a: 4},
+      {q: "5 + 6 = ?", a: 11}
+    ];
+    let currentCloud = 0;
+
+    function preload() {
+      this.load.image('player', 'https://labs.phaser.io/assets/sprites/phaser-dude.png');
+      this.load.image('cloud', 'https://labs.phaser.io/assets/particles/cloud.png');
+      this.load.image('grass', 'https://labs.phaser.io/assets/skies/sky4.png');
+    }
+
+    function create() {
+      this.add.image(320, 240, 'grass');
+
+      player = this.physics.add.image(320, 440, 'player');
+      player.setCollideWorldBounds(true);
+
+      cursors = this.input.keyboard.createCursorKeys();
+
+      // Add cloud blocks at fixed positions
+      let cloudPositions = [
+        {x: 320, y: 360},
+        {x: 320, y: 280},
+        {x: 320, y: 200},
+        {x: 320, y: 120}
+      ];
+
+      cloudPositions.forEach(pos => {
+        let cloud = this.physics.add.image(pos.x, pos.y, 'cloud').setScale(0.5);
+        cloud.blocked = true;
+        clouds.push(cloud);
+      });
+    }
+
+    function update() {
+      player.setVelocity(0);
+
+      if (cursors.up.isDown) {
+        let nextCloud = clouds[currentCloud];
+        if (nextCloud && Phaser.Math.Distance.Between(player.x, player.y, nextCloud.x, nextCloud.y) < 20) {
+          askQuestion(nextCloud);
+        } else {
+          player.y -= 2;
+        }
+      } else if (cursors.down.isDown) {
+        player.y += 2;
+      } else if (cursors.left.isDown) {
+        player.x -= 2;
+      } else if (cursors.right.isDown) {
+        player.x += 2;
+      }
+    }
+
+    function askQuestion(cloud) {
+      let q = questions[currentCloud];
+      let answer = prompt(q.q);
+      if (parseInt(answer) === q.a) {
+        cloud.destroy();
+        currentCloud++;
+        alert("Correct! The path clears...");
+      } else {
+        alert("Oops! Try again.");
+      }
+    }
+  </script>
+</body>
+</html>
