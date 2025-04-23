@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.4">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Math Maze Forest Quest&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background-color: #222;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-family: sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>canvas {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: block;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin: 0 auto;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;h1&gt;🌲 Math Maze: Forest Quest 🌲&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;p&gt;Use arrow keys to move. Answer math questions to reveal the forest path!&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const config = {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>type: Phaser.AUTO,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 640,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>height: 480,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>backgroundColor: '#88cc88',</p>
+<p class="p1"><span class="Apple-converted-space">      </span>physics: {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>default: 'arcade',</p>
+<p class="p1"><span class="Apple-converted-space">        </span>arcade: {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>debug: false</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>},</p>
+<p class="p1"><span class="Apple-converted-space">      </span>scene: {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>preload,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>create,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>update</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const game = new Phaser.Game(config);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let player;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let cursors;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let clouds = [];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let questions = [</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{q: "3 + 4 = ?", a: 7},</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{q: "6 x 2 = ?", a: 12},</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{q: "9 - 5 = ?", a: 4},</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{q: "5 + 6 = ?", a: 11}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let currentCloud = 0;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function preload() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>this.load.image('player', 'https://labs.phaser.io/assets/sprites/phaser-dude.png');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>this.load.image('cloud', 'https://labs.phaser.io/assets/particles/cloud.png');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>this.load.image('grass', 'https://labs.phaser.io/assets/skies/sky4.png');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function create() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>this.add.image(320, 240, 'grass');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>player = this.physics.add.image(320, 440, 'player');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>player.setCollideWorldBounds(true);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>cursors = this.input.keyboard.createCursorKeys();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Add cloud blocks at fixed positions</p>
+<p class="p1"><span class="Apple-converted-space">      </span>let cloudPositions = [</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{x: 320, y: 360},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{x: 320, y: 280},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{x: 320, y: 200},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{x: 320, y: 120}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>cloudPositions.forEach(pos =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let cloud = this.physics.add.image(pos.x, pos.y, 'cloud').setScale(0.5);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>cloud.blocked = true;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>clouds.push(cloud);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function update() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>player.setVelocity(0);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (cursors.up.isDown) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let nextCloud = clouds[currentCloud];</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (nextCloud &amp;&amp; Phaser.Math.Distance.Between(player.x, player.y, nextCloud.x, nextCloud.y) &lt; 20) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>askQuestion(nextCloud);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>player.y -= 2;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else if (cursors.down.isDown) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>player.y += 2;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else if (cursors.left.isDown) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>player.x -= 2;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else if (cursors.right.isDown) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>player.x += 2;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function askQuestion(cloud) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>let q = questions[currentCloud];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>let answer = prompt(q.q);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (parseInt(answer) === q.a) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>cloud.destroy();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>currentCloud++;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>alert("Correct! The path clears...");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>alert("Oops! Try again.");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
